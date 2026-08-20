@@ -14,9 +14,9 @@ import (
 )
 
 type Args struct {
-	FoodNameOrID any    `json:"food_name_or_id"`
+	FoodNameOrID string    `json:"food_name_or_id"`
 	Amount       string `json:"amount"`
-	UnitNameOrID any    `json:"unit_name_or_id"`
+	UnitNameOrID string    `json:"unit_name_or_id"`
 	Note         string `json:"note,omitempty"`
 }
 
@@ -120,25 +120,13 @@ func parseAmount(s string) (float64, error) {
 	return 0, fmt.Errorf("invalid amount format: %q", s)
 }
 
-func parseNameOrID(val any) (int, string) {
-	if val == nil {
+func parseNameOrID(val string) (int, string) {
+	s := strings.TrimSpace(val)
+	if s == "" {
 		return 0, ""
 	}
-	switch v := val.(type) {
-	case int:
-		return v, ""
-	case int32:
-		return int(v), ""
-	case int64:
-		return int(v), ""
-	case float64:
-		return int(v), ""
-	case string:
-		s := strings.TrimSpace(v)
-		if id, err := strconv.Atoi(s); err == nil {
-			return id, ""
-		}
-		return 0, s
+	if id, err := strconv.Atoi(s); err == nil {
+		return id, ""
 	}
-	return 0, ""
+	return 0, s
 }
