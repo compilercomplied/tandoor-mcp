@@ -69,3 +69,10 @@ func Get(ctx context.Context, c *tandoor.Client, id int) (*IngredientResponse, e
 	return res, nil
 }
 
+func Update(ctx context.Context, c *tandoor.Client, id int, params UpdateParams) (*IngredientResponse, error) {
+	res, err := tandoor.Request[IngredientResponse](ctx, c, "PATCH", fmt.Sprintf("/api/ingredient/%d/", id), nil, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update ingredient %d: %w", id, err)
+	}
+	return res, nil
+}

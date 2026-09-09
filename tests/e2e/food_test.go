@@ -11,6 +11,7 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_foods"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_food"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_food_merge"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_food"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -84,6 +85,22 @@ func TestFoodE2E(t *testing.T) {
 		}
 		if !found {
 			t.Errorf("expected to find food ID %d in get_foods response", fd.ID)
+		}
+	})
+
+	t.Run("HappyPath_UpdateFood", func(t *testing.T) {
+		// Arrange
+		createRes, createErr := infra.CallTool(ctx, fixture.Client, "create_food", create_food.Args{Name: "Tomate"})
+		infra.AssertToolSuccess(t, createRes, createErr)
+		created := infra.ParseToolResponse[food.FoodResponse](t, createRes)
+		name := "Tomato"
+		// Act
+		res, err := infra.CallTool(ctx, fixture.Client, "update_food", update_food.Args{FoodID: created.ID, ExpectedName: created.Name, Name: &name})
+		// Assert
+		infra.AssertToolSuccess(t, res, err)
+		updated := infra.ParseToolResponse[food.FoodResponse](t, res)
+		if updated.Name != name {
+			t.Errorf("expected name %q, got %q", name, updated.Name)
 		}
 	})
 

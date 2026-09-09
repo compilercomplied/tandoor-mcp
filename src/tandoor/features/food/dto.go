@@ -33,6 +33,14 @@ type FoodParam struct {
 	Parent         *int    `json:"parent,omitempty"`
 }
 
+type UpdateParams struct {
+	Name           *string `json:"name,omitempty"`
+	PluralName     *string `json:"plural_name,omitempty"`
+	Description    *string `json:"description,omitempty"`
+	IgnoreShopping *bool   `json:"ignore_shopping,omitempty"`
+	Parent         *int    `json:"parent,omitempty"`
+}
+
 // FoodInheritFieldResponse represents a field inheritance configuration
 type FoodInheritFieldResponse struct {
 	ID    int     `json:"id"`

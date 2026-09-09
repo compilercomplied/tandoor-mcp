@@ -14,6 +14,7 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_units"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_unit"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_unit_merge"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_unit"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -87,6 +88,22 @@ func TestUnitE2E(t *testing.T) {
 		}
 		if !found {
 			t.Errorf("expected to find unit ID %d in get_units response", u.ID)
+		}
+	})
+
+	t.Run("HappyPath_UpdateUnit", func(t *testing.T) {
+		// Arrange
+		createRes, createErr := infra.CallTool(ctx, fixture.Client, "create_unit", create_unit.Args{Name: "tablespoon"})
+		infra.AssertToolSuccess(t, createRes, createErr)
+		created := infra.ParseToolResponse[unit.UnitResponse](t, createRes)
+		name := "tbsp"
+		// Act
+		res, err := infra.CallTool(ctx, fixture.Client, "update_unit", update_unit.Args{UnitID: created.ID, Name: &name})
+		// Assert
+		infra.AssertToolSuccess(t, res, err)
+		updated := infra.ParseToolResponse[unit.UnitResponse](t, res)
+		if updated.Name != name {
+			t.Errorf("expected name %q, got %q", name, updated.Name)
 		}
 	})
 

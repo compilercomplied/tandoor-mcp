@@ -60,3 +60,11 @@ func Merge(ctx context.Context, c *tandoor.Client, source, target *FoodResponse)
 	}
 	return res, nil
 }
+
+func Update(ctx context.Context, c *tandoor.Client, id int, params UpdateParams) (*FoodResponse, error) {
+	res, err := tandoor.Request[FoodResponse](ctx, c, "PATCH", fmt.Sprintf("/api/food/%d/", id), nil, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update food %d: %w", id, err)
+	}
+	return res, nil
+}

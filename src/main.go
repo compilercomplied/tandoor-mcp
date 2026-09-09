@@ -63,10 +63,13 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_food_merge"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_unit_merge"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/remove_shopping_list_item"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_food"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_ingredient"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/update_inventory_entry"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/update_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/update_shopping_list_item"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/update_tandoor_step"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_unit"
 	mcp_sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -131,6 +134,8 @@ func main() {
 	get_inventory_entries.Register(server, client)
 	create_inventory_entry.Register(server, client)
 	update_inventory_entry.Register(server, client)
+	update_food.Register(server, client)
+	update_ingredient.Register(server, client)
 	update_recipe.Register(server, client)
 	get_inventory_logs.Register(server, client)
 	get_foods.Register(server, client)
@@ -143,6 +148,7 @@ func main() {
 	get_unit_conversions.Register(server, client)
 	create_unit_conversion.Register(server, client)
 	update_tandoor_step.Register(server, client)
+	update_unit.Register(server, client)
 	preview_food_merge.Register(server, client)
 	merge_food.Register(server, client)
 	preview_unit_merge.Register(server, client)

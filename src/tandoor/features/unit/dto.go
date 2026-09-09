@@ -27,6 +27,14 @@ type UnitParam struct {
 	OpenDataSlug *string `json:"open_data_slug,omitempty"`
 }
 
+type UpdateParams struct {
+	Name         *string `json:"name,omitempty"`
+	PluralName   *string `json:"plural_name,omitempty"`
+	Description  *string `json:"description,omitempty"`
+	BaseUnit     *string `json:"base_unit,omitempty"`
+	OpenDataSlug *string `json:"open_data_slug,omitempty"`
+}
+
 // UnitRef is a reference to a unit for nested structures
 type UnitRef struct {
 	ID   int    `json:"id"`

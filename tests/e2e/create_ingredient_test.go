@@ -10,6 +10,7 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor/features/ingredient"
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor/features/step"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_ingredient"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_ingredient"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -44,6 +45,24 @@ func TestCreateIngredientE2E(t *testing.T) {
 		}
 		if ing.Amount != 2 {
 			t.Errorf("expected Amount=2, got %v", ing.Amount)
+		}
+	})
+
+	t.Run("HappyPath_UpdateIngredient", func(t *testing.T) {
+		// Arrange
+		recipeID := 1
+		createRes, createErr := infra.CallTool(ctx, fixture.Client, "create_ingredient", create_ingredient.Args{FoodName: "Tomato", UnitName: "g", Amount: 100, RecipeID: &recipeID})
+		infra.AssertToolSuccess(t, createRes, createErr)
+		created := infra.ParseToolResponse[ingredient.IngredientResponse](t, createRes)
+		amount := 250.0
+		note := "diced"
+		// Act
+		res, err := infra.CallTool(ctx, fixture.Client, "update_ingredient", update_ingredient.Args{IngredientID: created.ID, Amount: &amount, Note: &note})
+		// Assert
+		infra.AssertToolSuccess(t, res, err)
+		updated := infra.ParseToolResponse[ingredient.IngredientResponse](t, res)
+		if updated.Amount != amount || updated.Note != note {
+			t.Errorf("expected amount %v and note %q, got %v and %q", amount, note, updated.Amount, updated.Note)
 		}
 	})
 

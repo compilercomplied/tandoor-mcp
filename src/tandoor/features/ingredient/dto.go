@@ -32,3 +32,12 @@ type IngredientResponse struct {
 	Note   string  `json:"note"`
 	Order  int     `json:"order"`
 }
+
+type UpdateParams struct {
+	Food     *FoodRef `json:"food,omitempty"`
+	Unit     *UnitRef `json:"unit,omitempty"`
+	Amount   *float64 `json:"amount,omitempty"`
+	Note     *string  `json:"note,omitempty"`
+	Order    *int     `json:"order,omitempty"`
+	NoAmount *bool    `json:"no_amount,omitempty"`
+}

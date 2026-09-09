@@ -50,12 +50,16 @@ func TestUpdateRecipeE2E(t *testing.T) {
 	created := infra.ParseToolResponse[api_create_recipe.RecipeResponse](t, createRes)
 	translatedName := "Spanish omelette"
 	translatedDescription := "Potatoes and eggs"
+	sourceURL := "https://example.com/tortilla"
+	private := true
 
 	// Act
 	res, err := infra.CallTool(ctx, fixture.Client, "update_recipe", update_recipe.Args{
 		RecipeID:    created.ID,
 		Name:        &translatedName,
 		Description: &translatedDescription,
+		SourceURL:   &sourceURL,
+		Private:     &private,
 	})
 
 	// Assert
@@ -66,6 +70,9 @@ func TestUpdateRecipeE2E(t *testing.T) {
 	}
 	if updated.Description != translatedDescription {
 		t.Errorf("expected description %q, got %q", translatedDescription, updated.Description)
+	}
+	if updated.SourceURL == nil || *updated.SourceURL != sourceURL || updated.Private != private {
+		t.Errorf("expected source URL %q and private %v, got %v and %v", sourceURL, private, updated.SourceURL, updated.Private)
 	}
 }
 

@@ -50,6 +50,14 @@ func Merge(ctx context.Context, c *tandoor.Client, source, target *UnitResponse)
 	return res, nil
 }
 
+func Update(ctx context.Context, c *tandoor.Client, id int, params UpdateParams) (*UnitResponse, error) {
+	res, err := tandoor.Request[UnitResponse](ctx, c, "PATCH", fmt.Sprintf("/api/unit/%d/", id), nil, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update unit %d: %w", id, err)
+	}
+	return res, nil
+}
+
 // CreateUnitConversion calls POST /api/unit-conversion/
 func CreateUnitConversion(ctx context.Context, c *tandoor.Client, params UnitConversionParam) (*UnitConversionResponse, error) {
 	res, err := tandoor.Request[UnitConversionResponse](ctx, c, "POST", "/api/unit-conversion/", nil, params)
