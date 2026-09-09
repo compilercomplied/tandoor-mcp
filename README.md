@@ -16,9 +16,9 @@ The Tandoor MCP server currently supports the following features:
 - ✅ **Supermarkets**: Manage supermarkets and categories (`get_supermarkets`, `create_supermarket`, `get_supermarket_categories`, `create_supermarket_category`, `add_category_to_supermarket`).
 - ✅ **Storage**: Manage storage integrations (`get_storages`, `create_storage`).
 - ✅ **Inventory**: Manage inventory locations, entries, and logs (`get_inventory_locations`, `create_inventory_location`, `get_inventory_entries`, `create_inventory_entry`, `update_inventory_entry`, `get_inventory_logs`).
-- ✅ **Foods**: Query available foods and inheritance fields (`get_foods`, `create_food`, `get_food_inherit_fields`).
+- ✅ **Foods**: Query, preview, and merge duplicate foods (`get_foods`, `create_food`, `get_food_inherit_fields`, `preview_food_merge`, `merge_food`).
 - ✅ **Keywords**: Manage keywords (`get_keywords`, `create_keyword`).
-- ✅ **Units**: Manage units and unit conversions (`get_units`, `create_unit`, `get_unit_conversions`, `create_unit_conversion`).
+- ✅ **Units**: Manage units and unit conversions, including duplicate cleanup (`get_units`, `create_unit`, `get_unit_conversions`, `create_unit_conversion`, `preview_unit_merge`, `merge_unit`).
 - ✅ **Properties**: Manage food properties (`get_property_types`, `create_property_type`, `get_properties`, `create_property`).
 
 \* see code documentation for more details

@@ -40,6 +40,16 @@ func GetUnit(ctx context.Context, c *tandoor.Client, id int) (*UnitResponse, err
 	return res, nil
 }
 
+// Merge combines source into target. Tandoor transfers references to target and removes source.
+func Merge(ctx context.Context, c *tandoor.Client, source, target *UnitResponse) (*UnitResponse, error) {
+	path := fmt.Sprintf("/api/unit/%d/merge/%d/", source.ID, target.ID)
+	res, err := tandoor.Request[UnitResponse](ctx, c, "PUT", path, nil, source)
+	if err != nil {
+		return nil, fmt.Errorf("failed to merge unit %d into %d: %w", source.ID, target.ID, err)
+	}
+	return res, nil
+}
+
 // CreateUnitConversion calls POST /api/unit-conversion/
 func CreateUnitConversion(ctx context.Context, c *tandoor.Client, params UnitConversionParam) (*UnitConversionResponse, error) {
 	res, err := tandoor.Request[UnitConversionResponse](ctx, c, "POST", "/api/unit-conversion/", nil, params)

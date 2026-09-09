@@ -10,58 +10,61 @@ import (
 	"os"
 	"strings"
 
-
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/add_category_to_supermarket"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/add_shopping_list_item"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/auto_plan"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_bookmarklet_import"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_cook_log"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_food"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_ingredient"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_inventory_entry"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_inventory_location"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_keyword"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_meal_plan"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_meal_type"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_property"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_property_type"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_recipe_import"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_storage"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_supermarket"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_supermarket_category"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_tandoor_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_tandoor_step"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_unit"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/create_unit_conversion"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_view_log"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_bookmarklet_imports"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_cook_logs"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_food_inherit_fields"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_foods"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_entries"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_locations"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_logs"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_keywords"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_meal_plans"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_meal_types"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_properties"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_property_types"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_recipe_details"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_recipe_imports"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_recipes"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/add_shopping_list_item"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_shopping_list"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/remove_shopping_list_item"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/update_shopping_list_item"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/add_category_to_supermarket"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_supermarket"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_supermarket_category"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_storages"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_supermarket_categories"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_supermarkets"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_storage"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_storages"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_locations"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_inventory_location"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_entries"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_inventory_entry"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/update_inventory_entry"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_inventory_logs"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_view_logs"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/parse_ingredients"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_foods"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_food"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_food_inherit_fields"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_keywords"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_keyword"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_units"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_unit"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_unit_conversions"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_unit_conversion"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_property_types"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_property_type"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/get_properties"
-	"github.com/compilercomplied/tandoor-mcp/src/tools/create_property"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_units"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/get_view_logs"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_food"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_unit"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/parse_ingredients"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_food_merge"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_unit_merge"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/remove_shopping_list_item"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_inventory_entry"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_shopping_list_item"
 	mcp_sdk "github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -136,6 +139,10 @@ func main() {
 	create_unit.Register(server, client)
 	get_unit_conversions.Register(server, client)
 	create_unit_conversion.Register(server, client)
+	preview_food_merge.Register(server, client)
+	merge_food.Register(server, client)
+	preview_unit_merge.Register(server, client)
+	merge_unit.Register(server, client)
 	get_property_types.Register(server, client)
 	create_property_type.Register(server, client)
 	get_properties.Register(server, client)
@@ -178,4 +185,3 @@ func SetupLogging(format string) {
 		log.SetOutput(slog.NewLogLogger(handler, slog.LevelInfo).Writer())
 	}
 }
-

@@ -9,6 +9,8 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_food"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_food_inherit_fields"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_foods"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_food"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_food_merge"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -82,6 +84,69 @@ func TestFoodE2E(t *testing.T) {
 		}
 		if !found {
 			t.Errorf("expected to find food ID %d in get_foods response", fd.ID)
+		}
+	})
+
+	t.Run("HappyPath_PreviewAndMergeFood", func(t *testing.T) {
+		// Arrange
+		targetRes, targetErr := infra.CallTool(ctx, fixture.Client, "create_food", create_food.Args{Name: "Tomato"})
+		infra.AssertToolSuccess(t, targetRes, targetErr)
+		target := infra.ParseToolResponse[food.FoodResponse](t, targetRes)
+		sourceRes, sourceErr := infra.CallTool(ctx, fixture.Client, "create_food", create_food.Args{Name: "Tomatoes"})
+		infra.AssertToolSuccess(t, sourceRes, sourceErr)
+		source := infra.ParseToolResponse[food.FoodResponse](t, sourceRes)
+
+		// Act
+		previewRes, previewErr := infra.CallTool(ctx, fixture.Client, "preview_food_merge", preview_food_merge.Args{
+			SourceFoodID: source.ID,
+			TargetFoodID: target.ID,
+		})
+
+		// Assert
+		infra.AssertToolSuccess(t, previewRes, previewErr)
+		preview := infra.ParseToolResponse[preview_food_merge.Response](t, previewRes)
+		if preview.Source.Name != source.Name || preview.Target.Name != target.Name {
+			t.Fatalf("expected preview %q -> %q, got %q -> %q", source.Name, target.Name, preview.Source.Name, preview.Target.Name)
+		}
+
+		// Act
+		mergeRes, mergeErr := infra.CallTool(ctx, fixture.Client, "merge_food", merge_food.Args{
+			SourceFoodID:       source.ID,
+			TargetFoodID:       target.ID,
+			ExpectedSourceName: source.Name,
+			ExpectedTargetName: target.Name,
+		})
+
+		// Assert
+		infra.AssertToolSuccess(t, mergeRes, mergeErr)
+	})
+
+	t.Run("ValidationError_StaleMergePreview", func(t *testing.T) {
+		// Arrange
+		targetRes, targetErr := infra.CallTool(ctx, fixture.Client, "create_food", create_food.Args{Name: "Canonical tomato"})
+		infra.AssertToolSuccess(t, targetRes, targetErr)
+		target := infra.ParseToolResponse[food.FoodResponse](t, targetRes)
+		sourceRes, sourceErr := infra.CallTool(ctx, fixture.Client, "create_food", create_food.Args{Name: "stale tomatoes"})
+		infra.AssertToolSuccess(t, sourceRes, sourceErr)
+		source := infra.ParseToolResponse[food.FoodResponse](t, sourceRes)
+
+		// Act
+		res, err := infra.CallTool(ctx, fixture.Client, "merge_food", merge_food.Args{
+			SourceFoodID:       source.ID,
+			TargetFoodID:       target.ID,
+			ExpectedSourceName: "outdated food name",
+			ExpectedTargetName: target.Name,
+		})
+
+		// Assert
+		if err != nil {
+			t.Fatalf("unexpected transport error: %v", err)
+		}
+		if !res.IsError {
+			t.Fatal("expected a stale merge preview to be rejected")
+		}
+		if !strings.Contains(infra.ExtractErrorText(t, res), "run preview_food_merge again") {
+			t.Fatalf("expected stale preview error, got %q", infra.ExtractErrorText(t, res))
 		}
 	})
 

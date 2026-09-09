@@ -50,3 +50,13 @@ func Get(ctx context.Context, c *tandoor.Client, id int) (*FoodResponse, error) 
 	}
 	return res, nil
 }
+
+// Merge combines source into target. Tandoor transfers references to target and removes source.
+func Merge(ctx context.Context, c *tandoor.Client, source, target *FoodResponse) (*FoodResponse, error) {
+	path := fmt.Sprintf("/api/food/%d/merge/%d/", source.ID, target.ID)
+	res, err := tandoor.Request[FoodResponse](ctx, c, "PUT", path, nil, source)
+	if err != nil {
+		return nil, fmt.Errorf("failed to merge food %d into %d: %w", source.ID, target.ID, err)
+	}
+	return res, nil
+}

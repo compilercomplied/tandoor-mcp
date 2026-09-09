@@ -12,6 +12,8 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_unit_conversion"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_unit_conversions"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/get_units"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/merge_unit"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/preview_unit_merge"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -26,8 +28,8 @@ func TestUnitE2E(t *testing.T) {
 		desc := "Metric weight unit"
 
 		args := create_unit.Args{
-			Name:       name,
-			PluralName: &pluralName,
+			Name:        name,
+			PluralName:  &pluralName,
 			Description: &desc,
 		}
 
@@ -85,6 +87,69 @@ func TestUnitE2E(t *testing.T) {
 		}
 		if !found {
 			t.Errorf("expected to find unit ID %d in get_units response", u.ID)
+		}
+	})
+
+	t.Run("HappyPath_PreviewAndMergeUnit", func(t *testing.T) {
+		// Arrange
+		targetRes, targetErr := infra.CallTool(ctx, fixture.Client, "create_unit", create_unit.Args{Name: "Tablespoon"})
+		infra.AssertToolSuccess(t, targetRes, targetErr)
+		target := infra.ParseToolResponse[unit.UnitResponse](t, targetRes)
+		sourceRes, sourceErr := infra.CallTool(ctx, fixture.Client, "create_unit", create_unit.Args{Name: "tbsp."})
+		infra.AssertToolSuccess(t, sourceRes, sourceErr)
+		source := infra.ParseToolResponse[unit.UnitResponse](t, sourceRes)
+
+		// Act
+		previewRes, previewErr := infra.CallTool(ctx, fixture.Client, "preview_unit_merge", preview_unit_merge.Args{
+			SourceUnitID: source.ID,
+			TargetUnitID: target.ID,
+		})
+
+		// Assert
+		infra.AssertToolSuccess(t, previewRes, previewErr)
+		preview := infra.ParseToolResponse[preview_unit_merge.Response](t, previewRes)
+		if preview.Source.Name != source.Name || preview.Target.Name != target.Name {
+			t.Fatalf("expected preview %q -> %q, got %q -> %q", source.Name, target.Name, preview.Source.Name, preview.Target.Name)
+		}
+
+		// Act
+		mergeRes, mergeErr := infra.CallTool(ctx, fixture.Client, "merge_unit", merge_unit.Args{
+			SourceUnitID:       source.ID,
+			TargetUnitID:       target.ID,
+			ExpectedSourceName: source.Name,
+			ExpectedTargetName: target.Name,
+		})
+
+		// Assert
+		infra.AssertToolSuccess(t, mergeRes, mergeErr)
+	})
+
+	t.Run("ValidationError_StaleMergePreview", func(t *testing.T) {
+		// Arrange
+		targetRes, targetErr := infra.CallTool(ctx, fixture.Client, "create_unit", create_unit.Args{Name: "Canonical tablespoon"})
+		infra.AssertToolSuccess(t, targetRes, targetErr)
+		target := infra.ParseToolResponse[unit.UnitResponse](t, targetRes)
+		sourceRes, sourceErr := infra.CallTool(ctx, fixture.Client, "create_unit", create_unit.Args{Name: "stale tbsp"})
+		infra.AssertToolSuccess(t, sourceRes, sourceErr)
+		source := infra.ParseToolResponse[unit.UnitResponse](t, sourceRes)
+
+		// Act
+		res, err := infra.CallTool(ctx, fixture.Client, "merge_unit", merge_unit.Args{
+			SourceUnitID:       source.ID,
+			TargetUnitID:       target.ID,
+			ExpectedSourceName: "outdated unit name",
+			ExpectedTargetName: target.Name,
+		})
+
+		// Assert
+		if err != nil {
+			t.Fatalf("unexpected transport error: %v", err)
+		}
+		if !res.IsError {
+			t.Fatal("expected a stale merge preview to be rejected")
+		}
+		if !strings.Contains(infra.ExtractErrorText(t, res), "run preview_unit_merge again") {
+			t.Fatalf("expected stale preview error, got %q", infra.ExtractErrorText(t, res))
 		}
 	})
 
