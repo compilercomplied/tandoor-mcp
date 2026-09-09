@@ -6,9 +6,11 @@ import (
 
 	api_create_recipe "github.com/compilercomplied/tandoor-mcp/src/tandoor/features/create_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor/features/ingredient"
+	api_update_recipe "github.com/compilercomplied/tandoor-mcp/src/tandoor/features/update_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_ingredient"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_recipe"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_tandoor_recipe"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_recipe"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -33,6 +35,37 @@ func TestCreateRecipeE2E(t *testing.T) {
 	}
 	if recipe.Description != "A tasty recipe" {
 		t.Errorf("expected description 'A tasty recipe', got %q", recipe.Description)
+	}
+}
+
+func TestUpdateRecipeE2E(t *testing.T) {
+	// Arrange
+	ctx := context.Background()
+	defer infra.PurgeAndSeedDatabase()
+	createRes, createErr := infra.CallTool(ctx, fixture.Client, "create_tandoor_recipe", create_tandoor_recipe.Args{
+		Name:        "Tortilla española",
+		Description: "Patatas y huevo",
+	})
+	infra.AssertToolSuccess(t, createRes, createErr)
+	created := infra.ParseToolResponse[api_create_recipe.RecipeResponse](t, createRes)
+	translatedName := "Spanish omelette"
+	translatedDescription := "Potatoes and eggs"
+
+	// Act
+	res, err := infra.CallTool(ctx, fixture.Client, "update_recipe", update_recipe.Args{
+		RecipeID:    created.ID,
+		Name:        &translatedName,
+		Description: &translatedDescription,
+	})
+
+	// Assert
+	infra.AssertToolSuccess(t, res, err)
+	updated := infra.ParseToolResponse[api_update_recipe.Response](t, res)
+	if updated.Name != translatedName {
+		t.Errorf("expected name %q, got %q", translatedName, updated.Name)
+	}
+	if updated.Description != translatedDescription {
+		t.Errorf("expected description %q, got %q", translatedDescription, updated.Description)
 	}
 }
 

@@ -10,6 +10,7 @@ import (
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor/features/ingredient"
 	"github.com/compilercomplied/tandoor-mcp/src/tandoor/features/step"
 	"github.com/compilercomplied/tandoor-mcp/src/tools/create_tandoor_step"
+	"github.com/compilercomplied/tandoor-mcp/src/tools/update_tandoor_step"
 	"github.com/compilercomplied/tandoor-mcp/tests/e2e/infra"
 )
 
@@ -142,4 +143,36 @@ func TestCreateStepE2E(t *testing.T) {
 			t.Errorf("expected error message to contain 'Error creating step', got %q", errText)
 		}
 	})
+}
+
+func TestUpdateTandoorStepE2E(t *testing.T) {
+	// Arrange
+	ctx := context.Background()
+	defer infra.PurgeAndSeedDatabase()
+	createRes, createErr := infra.CallTool(ctx, fixture.Client, "create_tandoor_step", create_tandoor_step.Args{
+		RecipeID:    1,
+		Name:        "Preparación",
+		Instruction: "Corta las patatas",
+	})
+	infra.AssertToolSuccess(t, createRes, createErr)
+	created := infra.ParseToolResponse[step.StepResponse](t, createRes)
+	translatedName := "Preparation"
+	translatedInstruction := "Slice the potatoes"
+
+	// Act
+	res, err := infra.CallTool(ctx, fixture.Client, "update_tandoor_step", update_tandoor_step.Args{
+		StepID:      created.ID,
+		Name:        &translatedName,
+		Instruction: &translatedInstruction,
+	})
+
+	// Assert
+	infra.AssertToolSuccess(t, res, err)
+	updated := infra.ParseToolResponse[step.StepResponse](t, res)
+	if updated.Name != translatedName {
+		t.Errorf("expected name %q, got %q", translatedName, updated.Name)
+	}
+	if updated.Instruction != translatedInstruction {
+		t.Errorf("expected instruction %q, got %q", translatedInstruction, updated.Instruction)
+	}
 }

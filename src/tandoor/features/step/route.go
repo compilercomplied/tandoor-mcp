@@ -45,3 +45,13 @@ func Create(ctx context.Context, c *tandoor.Client, recipeID int, params StepPar
 
 	return nil, fmt.Errorf("failed to extract created step from Tandoor response")
 }
+
+// Update partially updates a step without replacing fields that were not supplied.
+func Update(ctx context.Context, c *tandoor.Client, stepID int, params UpdateStepParam) (*StepResponse, error) {
+	path := fmt.Sprintf("/api/step/%d/", stepID)
+	res, err := tandoor.Request[StepResponse](ctx, c, "PATCH", path, nil, params)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update step %d: %w", stepID, err)
+	}
+	return res, nil
+}

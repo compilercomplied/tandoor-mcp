@@ -5,9 +5,9 @@ A Model Context Protocol (MCP) server written in Go that integrates with [Tandoo
 ## Features
 The Tandoor MCP server currently supports the following features:
 - ✅ **Get Recipes**: Retrieve a list of recipes from Tandoor (`get_recipes`).
-- ✅ **Create Recipe**: Create a new recipe in Tandoor (`create_recipe`*, `create_tandoor_recipe`).
+- ✅ **Recipes**: Create or partially update recipes (`create_recipe`*, `create_tandoor_recipe`, `update_recipe`).
 - ✅ **Get Recipe Details**: Retrieve full details of a specific recipe (`get_recipe_details`).
-- ✅ **Steps**: Manage recipe steps (`create_tandoor_step`*).
+- ✅ **Steps**: Create or partially update recipe steps (`create_tandoor_step`*, `update_tandoor_step`).
 - ✅ **Ingredients**: Manage ingredients (`create_ingredient`*).
 - ✅ **Cook Logs**: Track cooking history (`create_cook_log`, `get_cook_logs`, `create_view_log`, `get_view_logs`).
 - ✅ **Imports**: Manage recipe imports (`create_recipe_import`, `get_recipe_imports`, `create_bookmarklet_import`, `get_bookmarklet_imports`, `parse_ingredients`).
